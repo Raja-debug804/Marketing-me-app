@@ -1,0 +1,41 @@
+<!-- dashboards/templates/dashboards/widget_snippet.html -->
+<div id="notifyme-widget" class="border p-3 rounded shadow-sm" style="max-width:360px;font-family:system-ui;">
+  <h6 class="mb-2">Notify me on WhatsApp when back in stock</h6>
+  <form id="notifyme-form">
+    <div class="mb-2">
+      <label class="form-label small">WhatsApp number (with country code)</label>
+      <input type="tel" class="form-control form-control-sm" name="whatsapp" required>
+    </div>
+    <div class="mb-2">
+      <label class="form-label small">Name (optional)</label>
+      <input type="text" class="form-control form-control-sm" name="name">
+    </div>
+    <button class="btn btn-success btn-sm w-100" type="submit">Notify Me</button>
+  </form>
+  <div class="mt-2 text-muted small" id="notifyme-status" style="display:none;"></div>
+</div>
+<script>
+  (function() {
+    const form = document.getElementById('notifyme-form');
+    const statusBox = document.getElementById('notifyme-status');
+    form.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const payload = {
+        client_code: '{{ client.slug if client else "demo-client" }}',
+        external_product_id: '{{ product.external_product_id if product else "demo-product" }}',
+        external_variant_id: '{{ variant.external_variant_id if variant else "" }}',
+        whatsapp_number: form.whatsapp.value,
+        customer_whatsapp_number: form.whatsapp.value,
+        customer_name: form.name.value,
+      };
+      const response = await fetch('/api/notify-subscribe/', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(payload)
+      });
+      const data = await response.json();
+      statusBox.style.display = 'block';
+      statusBox.textContent = response.ok ? 'Subscription saved! We will notify you.' : 'Error: ' + (data.detail || 'Unable to save');
+    });
+  })();
+</script>
