@@ -11,7 +11,7 @@ class ShopifyConnectorSettings(Base):
     __tablename__ = "shopify_settings"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    tenant_id = Column(UUID(as_uuid=True), ForeignKey("platform_tenants.id"), nullable=False)
+    tenant_id = Column(UUID(as_uuid=True), ForeignKey("tenants.id"), nullable=False)
     shop_domain = Column(String, nullable=False)
     access_token = Column(String, nullable=False)
     status = Column(String, default="active")
@@ -25,7 +25,7 @@ class GA4ConnectorSettings(Base):
     __tablename__ = "ga4_settings"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    tenant_id = Column(UUID(as_uuid=True), ForeignKey("platform_tenants.id"), nullable=False)
+    tenant_id = Column(UUID(as_uuid=True), ForeignKey("tenants.id"), nullable=False)
     ga4_property_id = Column(String, nullable=False)
     credentials_json = Column(String, nullable=True)
     status = Column(String, default="active")

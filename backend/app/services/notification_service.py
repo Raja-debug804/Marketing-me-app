@@ -30,7 +30,9 @@ def render_template(template: str, context: dict) -> str:
 
 
 def build_product_url(base_url: str, utm_source: str, utm_medium: str, utm_campaign: str) -> str:
-    params = urlencode({"utm_source": utm_source, "utm_medium": utm_medium, "utm_campaign": utm_campaign})
+    params = urlencode(
+        {"utm_source": utm_source, "utm_medium": utm_medium, "utm_campaign": utm_campaign}
+    )
     separator = "&" if "?" in base_url else "?"
     return f"{base_url}{separator}{params}"
 
@@ -62,14 +64,11 @@ def send_notification_for_subscription(
             return None
 
     url_with_params = build_product_url(
-        product_url,
-        rule.utm_source or "notify",
-        rule.utm_medium or "whatsapp",
-        rule.utm_campaign or "campaign",
+        product_url, rule.utm_source or "notify", rule.utm_medium or "whatsapp", rule.utm_campaign or "campaign"
     )
 
     message = render_template(
-        template.body,
+        template.body_template,
         {
             "customer_name": subscription.customer_name,
             "product_name": subscription.product_name,

@@ -1,9 +1,11 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
+from app.api import deps
 from app.db.session import get_db
 from app.models.notify import NotificationRule, NotificationTemplate, NotificationTrigger, NotifySubscription
 from app.models.tenant import Tenant
+from app.models.user import User
 from app.schemas.notify import (
     NotificationRuleCreate,
     NotificationRuleRead,
@@ -14,13 +16,6 @@ from app.schemas.notify import (
 )
 
 router = APIRouter()
-
-
-def resolve_tenant(db: Session, tenant_identifier: str) -> Tenant:
-    tenant = db.query(Tenant).filter(Tenant.id == tenant_identifier).first()
-    if not tenant:
-        tenant = db.query(Tenant).filter(Tenant.slug == tenant_identifier).first()
-    return tenant
 
 
 @router.post("/public/notify/subscribe", response_model=NotifySubscriptionRead)
@@ -46,50 +41,49 @@ def public_subscribe(payload: NotifySubscriptionCreate, db: Session = Depends(ge
 
 
 @router.get("/notify/subscriptions", response_model=list[NotifySubscriptionRead])
-def list_subscriptions(db: Session = Depends(get_db)):
-    return db.query(NotifySubscription).order_by(NotifySubscription.created_at.desc()).all()
+def list_subscriptions(
+    current_user: User = Depends(deps.get_current_active_tenant_user),
+    db: Session = Depends(get_db),
+):
+    return (
+        db.query(NotifySubscription)
+        .filter(NotifySubscription.tenant_id == current_user.tenant_id)
+        .order_by(NotifySubscription.created_at.desc())
+        .all()
+    )
 
 
 @router.get("/notify/subscriptions/{subscription_id}", response_model=NotifySubscriptionRead)
-def get_subscription(subscription_id: str, db: Session = Depends(get_db)):
-    subscription = db.query(NotifySubscription).filter_by(id=subscription_id).first()
+def get_subscription(
+    subscription_id: str,
+    current_user: User = Depends(deps.get_current_active_tenant_user),
+    db: Session = Depends(get_db),
+):
+    subscription = db.query(NotifySubscription).filter_by(
+        id=subscription_id, tenant_id=current_user.tenant_id
+    ).first()
     if not subscription:
         raise HTTPException(status_code=404, detail="Not found")
     return subscription
 
 
-@router.get("/tenants/{tenant_id}/templates", response_model=list[NotificationTemplateRead])
-def list_templates(tenant_id: str, db: Session = Depends(get_db)):
-    tenant = resolve_tenant(db, tenant_id)
-    if not tenant:
-        raise HTTPException(status_code=404, detail="Tenant not found")
-    return db.query(NotificationTemplate).filter_by(tenant_id=tenant.id).order_by(NotificationTemplate.created_at.desc()).all()
+@router.get("/notify/templates", response_model=list[NotificationTemplateRead])
+def list_templates(
+    current_user: User = Depends(deps.get_current_active_tenant_user),
+    db: Session = Depends(get_db),
+):
+    return db.query(NotificationTemplate).filter_by(tenant_id=current_user.tenant_id).all()
 
 
-@router.post("/tenants/{tenant_id}/templates", response_model=NotificationTemplateRead)
-def create_template(tenant_id: str, payload: NotificationTemplateCreate, db: Session = Depends(get_db)):
-    tenant = resolve_tenant(db, tenant_id)
-    if not tenant:
-        raise HTTPException(status_code=404, detail="Tenant not found")
-    if payload.is_default:
-        db.query(NotificationTemplate).filter_by(tenant_id=tenant.id).update({"is_default": False})
-    template = NotificationTemplate(tenant_id=tenant.id, **payload.dict())
-    db.add(template)
-    db.commit()
-    db.refresh(template)
-    return template
-
-
-@router.post("/tenants/{tenant_id}/templates/{template_id}/default", response_model=NotificationTemplateRead)
-def set_default_template(tenant_id: str, template_id: str, db: Session = Depends(get_db)):
-    tenant = resolve_tenant(db, tenant_id)
-    if not tenant:
-        raise HTTPException(status_code=404, detail="Tenant not found")
-    template = db.query(NotificationTemplate).filter_by(id=template_id, tenant_id=tenant.id).first()
-    if not template:
-        raise HTTPException(status_code=404, detail="Template not found")
-    db.query(NotificationTemplate).filter_by(tenant_id=tenant.id).update({"is_default": False})
-    template.is_default = True
+@router.post("/notify/templates", response_model=NotificationTemplateRead)
+def create_template(
+    payload: NotificationTemplateCreate,
+    current_user: User = Depends(deps.get_current_active_tenant_user),
+    db: Session = Depends(get_db),
+):
+    template = NotificationTemplate(tenant_id=current_user.tenant_id, **payload.dict())
+    if template.is_default:
+        db.query(NotificationTemplate).filter_by(tenant_id=current_user.tenant_id).update({"is_default": False})
     db.add(template)
     db.commit()
     db.refresh(template)
@@ -97,13 +91,20 @@ def set_default_template(tenant_id: str, template_id: str, db: Session = Depends
 
 
 @router.get("/notify/rules", response_model=list[NotificationRuleRead])
-def list_rules(db: Session = Depends(get_db)):
-    return db.query(NotificationRule).all()
+def list_rules(
+    current_user: User = Depends(deps.get_current_active_tenant_user),
+    db: Session = Depends(get_db),
+):
+    return db.query(NotificationRule).filter_by(tenant_id=current_user.tenant_id).all()
 
 
 @router.post("/notify/rules", response_model=NotificationRuleRead)
-def create_rule(payload: NotificationRuleCreate, db: Session = Depends(get_db)):
-    rule = NotificationRule(**payload.dict())
+def create_rule(
+    payload: NotificationRuleCreate,
+    current_user: User = Depends(deps.get_current_active_tenant_user),
+    db: Session = Depends(get_db),
+):
+    rule = NotificationRule(tenant_id=current_user.tenant_id, **payload.dict())
     db.add(rule)
     db.commit()
     db.refresh(rule)

@@ -24,7 +24,7 @@ class NotifySubscription(Base):
     __tablename__ = "notify_subscriptions"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    tenant_id = Column(UUID(as_uuid=True), ForeignKey("platform_tenants.id"), nullable=False)
+    tenant_id = Column(UUID(as_uuid=True), ForeignKey("tenants.id"), nullable=False)
     customer_name = Column(String, nullable=False)
     whatsapp_number = Column(String, nullable=False)
     product_id = Column(String, nullable=False)
@@ -45,9 +45,10 @@ class NotificationTemplate(Base):
     __tablename__ = "notification_templates"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    tenant_id = Column(UUID(as_uuid=True), ForeignKey("platform_tenants.id"), nullable=False)
+    tenant_id = Column(UUID(as_uuid=True), ForeignKey("tenants.id"), nullable=False)
     name = Column(String, nullable=False)
-    body = Column(Text, nullable=False)
+    channel = Column(String, default="whatsapp")
+    body_template = Column(Text, nullable=False)
     is_default = Column(Boolean, default=False)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
@@ -59,7 +60,7 @@ class NotificationRule(Base):
     __tablename__ = "notification_rules"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    tenant_id = Column(UUID(as_uuid=True), ForeignKey("platform_tenants.id"), nullable=False)
+    tenant_id = Column(UUID(as_uuid=True), ForeignKey("tenants.id"), nullable=False)
     trigger_type = Column(String, default=NotificationTrigger.BACK_IN_STOCK.value)
     template_id = Column(UUID(as_uuid=True), ForeignKey("notification_templates.id"))
     active = Column(Boolean, default=True)

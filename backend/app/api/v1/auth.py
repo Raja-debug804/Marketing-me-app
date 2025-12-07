@@ -21,7 +21,7 @@ def login(data: LoginRequest, db: Session = Depends(get_db)):
             raise HTTPException(status_code=400, detail="Tenant not found")
         query = query.filter(User.tenant_id == tenant.id)
     user = query.first()
-    if not user or not verify_password(data.password, user.password_hash):
+    if not user or not verify_password(data.password, user.hashed_password):
         raise HTTPException(status_code=400, detail="Incorrect email or password")
     return Token(
         access_token=create_access_token(str(user.id)),

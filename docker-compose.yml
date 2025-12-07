@@ -1,11 +1,11 @@
 version: '3.9'
 services:
   db:
-    image: postgres:16
+    image: postgres:15
     environment:
-      POSTGRES_DB: notify_hub
-      POSTGRES_USER: notify_admin
-      POSTGRES_PASSWORD: notify_password
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_DB: notifyinsights
     ports:
       - "5432:5432"
     volumes:

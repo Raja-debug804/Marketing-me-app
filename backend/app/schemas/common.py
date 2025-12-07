@@ -17,15 +17,9 @@ class TenantCreate(TenantBase):
     pass
 
 
-class TenantUpdate(BaseModel):
-    name: Optional[str]
-    status: Optional[str]
-
-
 class TenantRead(TenantBase):
     id: str
     created_at: datetime
-    updated_at: Optional[datetime]
 
     class Config:
         orm_mode = True
@@ -49,7 +43,6 @@ class UserRead(UserBase):
     tenant_id: Optional[str] = None
     is_platform_admin: bool = False
     created_at: datetime
-    updated_at: Optional[datetime]
 
     class Config:
         orm_mode = True

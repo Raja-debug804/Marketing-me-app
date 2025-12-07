@@ -3,9 +3,34 @@ from typing import Optional
 from pydantic import BaseModel
 
 
+class NotifySubscriptionCreate(BaseModel):
+    tenant_slug: str
+    product_id: str
+    variant_id: Optional[str] = None
+    product_name: str
+    customer_name: str
+    whatsapp_number: str
+
+
+class NotifySubscriptionRead(BaseModel):
+    id: str
+    tenant_id: str
+    customer_name: str
+    whatsapp_number: str
+    product_id: str
+    variant_id: Optional[str]
+    product_name: str
+    status: str
+    created_at: datetime
+
+    class Config:
+        orm_mode = True
+
+
 class NotificationTemplateBase(BaseModel):
     name: str
-    body: str
+    channel: str = "whatsapp"
+    body_template: str
     is_default: bool = False
 
 
@@ -17,7 +42,7 @@ class NotificationTemplateRead(NotificationTemplateBase):
     id: str
     tenant_id: str
     created_at: datetime
-    updated_at: Optional[datetime]
+    updated_at: datetime
 
     class Config:
         orm_mode = True
@@ -42,33 +67,7 @@ class NotificationRuleRead(NotificationRuleBase):
     id: str
     tenant_id: str
     created_at: datetime
-    updated_at: Optional[datetime]
-
-    class Config:
-        orm_mode = True
-
-
-class NotifySubscriptionCreate(BaseModel):
-    tenant_slug: str
-    product_id: str
-    variant_id: Optional[str] = None
-    product_name: str
-    customer_name: str
-    whatsapp_number: str
-
-
-class NotifySubscriptionRead(BaseModel):
-    id: str
-    tenant_id: str
-    customer_name: str
-    whatsapp_number: str
-    product_id: str
-    variant_id: Optional[str] = None
-    product_name: str
-    source_channel: Optional[str] = None
-    status: str
-    created_at: datetime
-    notified_at: Optional[datetime] = None
+    updated_at: datetime
 
     class Config:
         orm_mode = True
