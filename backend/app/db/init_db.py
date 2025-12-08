@@ -9,7 +9,7 @@ from app.models.user import User, UserRole
 
 
 def init_db(db: Session):
-    Base.metadata.create_all(bind=engine)
+    # Schema is managed by Alembic migrations
     seed_tenants(db)
 
 
@@ -38,14 +38,14 @@ def seed_users(db: Session, tenant: Tenant):
         full_name=f"{tenant.name} Admin",
         role=UserRole.TENANT_ADMIN.value,
         tenant_id=tenant.id,
-        password_hash=get_password_hash("password123"),
+        hashed_password=get_password_hash("password123"),
     )
     analyst = User(
         email=f"analyst@{tenant.slug}.com",
         full_name=f"{tenant.name} Analyst",
         role=UserRole.ANALYST.value,
         tenant_id=tenant.id,
-        password_hash=get_password_hash("password123"),
+        hashed_password=get_password_hash("password123"),
     )
     db.add_all([admin, analyst])
     db.commit()
@@ -55,17 +55,25 @@ def seed_templates(db: Session, tenant: Tenant):
     existing = db.query(NotificationTemplate).filter(NotificationTemplate.tenant_id == tenant.id).count()
     if existing:
         return
-    default_template = NotificationTemplate(
-        tenant_id=tenant.id,
-        name="Back in stock default",
-        body="Hi {{customer_name}}, {{product_name}} is back! Buy now: {{product_url}}",
-        is_default=True,
-    )
-    promo_template = NotificationTemplate(
-        tenant_id=tenant.id,
-        name="Promo follow-up",
-        body="Thanks for waiting! {{product_name}} is live again.",
-        is_default=False,
-    )
-    db.add_all([default_template, promo_template])
+    templates = [
+        NotificationTemplate(
+            tenant_id=tenant.id,
+            name="Order Confirmation",
+            body_template="Hi {{customer_name}}, your order #{{order_number}} has been confirmed!",
+            is_default=True,
+        ),
+        NotificationTemplate(
+            tenant_id=tenant.id,
+            name="Shipping Update",
+            body_template="Your order is on its way! Track at: {{tracking_link}}",
+            is_default=False,
+        ),
+        NotificationTemplate(
+            tenant_id=tenant.id,
+            name="AI Copilot / Tenant Assistant",
+            body_template="Hello {{customer_name}}, this is an automated message from our AI assistant.",
+            is_default=False,
+        ),
+    ]
+    db.add_all(templates)
     db.commit()

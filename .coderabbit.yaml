@@ -1,0 +1,8 @@
+version: 1
+
+ignore: []
+
+review:
+  enable: true
+  on_save: true
+  on_change: true

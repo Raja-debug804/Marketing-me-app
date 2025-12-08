@@ -1,10 +1,26 @@
+from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.v1 import auth, integrations, notify, platform, users
 from app.db import base  # noqa: F401
+from app.db.init_db import init_db
+from app.db.session import SessionLocal
 
-app = FastAPI(title="NotifyInsights API")
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Startup
+    db = SessionLocal()
+    try:
+        init_db(db)
+    finally:
+        db.close()
+    yield
+    # Shutdown
+
+
+app = FastAPI(title="NotifyInsights API", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,

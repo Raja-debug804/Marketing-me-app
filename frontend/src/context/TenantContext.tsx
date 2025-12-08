@@ -1,53 +1,51 @@
-import { createContext, useContext, useEffect, useMemo, useState } from 'react'
-import { api, Tenant } from '../api/client'
+import React, {
+  createContext,
+  useContext,
+  useMemo,
+  useState,
+} from "react";
+import { useLocation } from "react-router-dom";
 
-type TenantContextState = {
-  tenants: Tenant[]
-  selectedTenant?: Tenant
-  setSelectedTenant: (tenant?: Tenant) => void
-  loading: boolean
-  error?: string
-  reload: () => Promise<void>
-}
+type Tenant = {
+  id: string;
+  name: string;
+};
 
-const TenantContext = createContext<TenantContextState | undefined>(undefined)
+type TenantContextValue = {
+  currentTenant: Tenant | null;
+  setCurrentTenant: (tenant: Tenant | null) => void;
+};
 
-export function TenantProvider({ children }: { children: React.ReactNode }) {
-  const [tenants, setTenants] = useState<Tenant[]>([])
-  const [selectedTenant, setSelectedTenant] = useState<Tenant | undefined>(undefined)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | undefined>(undefined)
+const TenantContext = createContext<TenantContextValue | undefined>(undefined);
 
-  const reload = async () => {
-    setLoading(true)
-    try {
-      const response = await api.get<Tenant[]>('/api/v1/platform/tenants')
-      setTenants(response.data)
-      setSelectedTenant((prev) => prev ?? response.data[0])
-    } catch (err) {
-      console.error(err)
-      setError('Unable to load tenants')
-    } finally {
-      setLoading(false)
-    }
-  }
+export const TenantProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  // ✅ useLocation is INSIDE the component (safe)
+  const location = useLocation();
 
-  useEffect(() => {
-    reload()
-  }, [])
+  // TODO: yahan tum apni location-based logic laga sakte ho
+  // e.g. route se tenant infer karna, etc.
+
+  const [currentTenant, setCurrentTenant] = useState<Tenant | null>(null);
 
   const value = useMemo(
-    () => ({ tenants, selectedTenant, setSelectedTenant, loading, error, reload }),
-    [tenants, selectedTenant, loading, error]
-  )
+    () => ({
+      currentTenant,
+      setCurrentTenant,
+    }),
+    [currentTenant]
+  );
 
-  return <TenantContext.Provider value={value}>{children}</TenantContext.Provider>
-}
+  return (
+    <TenantContext.Provider value={value}>
+      {children}
+    </TenantContext.Provider>
+  );
+};
 
-export function useTenant() {
-  const ctx = useContext(TenantContext)
+export const useTenant = (): TenantContextValue => {
+  const ctx = useContext(TenantContext);
   if (!ctx) {
-    throw new Error('useTenant must be used within a TenantProvider')
+    throw new Error("useTenant must be used within a TenantProvider");
   }
-  return ctx
-}
+  return ctx;
+};

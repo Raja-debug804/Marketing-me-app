@@ -1,13 +1,18 @@
-import React from 'react'
-import ReactDOM from 'react-dom/client'
-import { BrowserRouter } from 'react-router-dom'
-import AppRouter from './router/AppRouter'
-import './styles.css'
+import React from "react";
+import ReactDOM from "react-dom/client";
+import { BrowserRouter } from "react-router-dom";
+import { TenantProvider } from "./context/TenantContext";
+import AppRouter from "./router/AppRouter";
 
-ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
+// 🔥 REQUIRED → This was missing, causing NO STYLING
+import "./styles.css";
+
+ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>
     <BrowserRouter>
-      <AppRouter />
+      <TenantProvider>
+        <AppRouter />
+      </TenantProvider>
     </BrowserRouter>
   </React.StrictMode>
-)
+);

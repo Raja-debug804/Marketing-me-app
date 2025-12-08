@@ -1,6 +1,7 @@
 from datetime import datetime
 from typing import Optional
 from pydantic import BaseModel
+from uuid import UUID
 
 
 class NotifySubscriptionCreate(BaseModel):
@@ -13,8 +14,8 @@ class NotifySubscriptionCreate(BaseModel):
 
 
 class NotifySubscriptionRead(BaseModel):
-    id: str
-    tenant_id: str
+    id: UUID
+    tenant_id: UUID
     customer_name: str
     whatsapp_number: str
     product_id: str
@@ -24,7 +25,7 @@ class NotifySubscriptionRead(BaseModel):
     created_at: datetime
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class NotificationTemplateBase(BaseModel):
@@ -39,18 +40,18 @@ class NotificationTemplateCreate(NotificationTemplateBase):
 
 
 class NotificationTemplateRead(NotificationTemplateBase):
-    id: str
-    tenant_id: str
+    id: UUID
+    tenant_id: UUID
     created_at: datetime
     updated_at: datetime
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class NotificationRuleBase(BaseModel):
     trigger_type: str
-    template_id: str
+    template_id: UUID
     active: bool = True
     send_window_start: Optional[str] = None
     send_window_end: Optional[str] = None
@@ -64,10 +65,10 @@ class NotificationRuleCreate(NotificationRuleBase):
 
 
 class NotificationRuleRead(NotificationRuleBase):
-    id: str
-    tenant_id: str
+    id: UUID
+    tenant_id: UUID
     created_at: datetime
     updated_at: datetime
 
     class Config:
-        orm_mode = True
+        from_attributes = True

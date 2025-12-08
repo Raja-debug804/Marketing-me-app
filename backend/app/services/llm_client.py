@@ -11,18 +11,18 @@ async def call_phi4(messages: list[dict]) -> str:
     `messages` is a standard ChatCompletion-style list.
     Returns the assistant's text content.
     """
-    if not settings.PHI4_API_BASE or not settings.PHI4_API_KEY:
+    if not settings.phi4_api_base or not settings.phi4_api_key:
         raise RuntimeError("PHI4 configuration is missing. Set PHI4_API_BASE and PHI4_API_KEY.")
 
-    url = f"{settings.PHI4_API_BASE.rstrip('/')}/v1/chat/completions"
+    url = f"{settings.phi4_api_base.rstrip('/')}/v1/chat/completions"
 
     headers = {
-        "Authorization": f"Bearer {settings.PHI4_API_KEY}",
+        "Authorization": f"Bearer {settings.phi4_api_key}",
         "Content-Type": "application/json",
     }
 
     payload = {
-        "model": settings.PHI4_MODEL_NAME,
+        "model": settings.phi4_model_name,
         "messages": messages,
     }
 

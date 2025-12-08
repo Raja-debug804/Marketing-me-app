@@ -90,6 +90,39 @@ def create_template(
     return template
 
 
+@router.put("/notify/templates/{template_id}", response_model=NotificationTemplateRead)
+def update_template(
+    template_id: str,
+    payload: NotificationTemplateCreate,
+    current_user: User = Depends(deps.get_current_active_tenant_user),
+    db: Session = Depends(get_db),
+):
+    template = db.query(NotificationTemplate).filter_by(id=template_id, tenant_id=current_user.tenant_id).first()
+    if not template:
+        raise HTTPException(status_code=404, detail="Template not found")
+    for key, value in payload.dict().items():
+        setattr(template, key, value)
+    if template.is_default:
+        db.query(NotificationTemplate).filter_by(tenant_id=current_user.tenant_id).filter(NotificationTemplate.id != template_id).update({"is_default": False})
+    db.commit()
+    db.refresh(template)
+    return template
+
+
+@router.delete("/notify/templates/{template_id}")
+def delete_template(
+    template_id: str,
+    current_user: User = Depends(deps.get_current_active_tenant_user),
+    db: Session = Depends(get_db),
+):
+    template = db.query(NotificationTemplate).filter_by(id=template_id, tenant_id=current_user.tenant_id).first()
+    if not template:
+        raise HTTPException(status_code=404, detail="Template not found")
+    db.delete(template)
+    db.commit()
+    return {"message": "Template deleted"}
+
+
 @router.get("/notify/rules", response_model=list[NotificationRuleRead])
 def list_rules(
     current_user: User = Depends(deps.get_current_active_tenant_user),

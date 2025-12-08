@@ -1,6 +1,7 @@
 from datetime import datetime
 from typing import Optional
 from pydantic import BaseModel, EmailStr
+from uuid import UUID
 
 
 class Message(BaseModel):
@@ -18,11 +19,11 @@ class TenantCreate(TenantBase):
 
 
 class TenantRead(TenantBase):
-    id: str
+    id: UUID
     created_at: datetime
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class UserBase(BaseModel):
@@ -33,16 +34,15 @@ class UserBase(BaseModel):
 
 
 class UserCreate(UserBase):
-    password: str
-    tenant_id: Optional[str] = None
+    tenant_id: UUID
     is_platform_admin: bool = False
 
 
 class UserRead(UserBase):
-    id: str
-    tenant_id: Optional[str] = None
+    id: UUID
+    tenant_id: Optional[UUID] = None
     is_platform_admin: bool = False
     created_at: datetime
 
     class Config:
-        orm_mode = True
+        from_attributes = True

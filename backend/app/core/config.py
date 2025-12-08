@@ -1,5 +1,6 @@
 from functools import lru_cache
-from pydantic import BaseSettings, AnyUrl
+from pydantic import AnyUrl
+from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
@@ -11,6 +12,9 @@ class Settings(BaseSettings):
     refresh_token_expire_minutes: int = 60 * 24
     ga4_default_property: str = "demo"
     environment: str = "development"
+    phi4_api_base: str = ""
+    phi4_api_key: str = ""
+    phi4_model_name: str = "phi-4"
 
     class Config:
         env_file = ".env"
