@@ -4,6 +4,7 @@ import Card from '../components/Card'
 import FormField from '../components/FormField'
 import PrimaryButton from '../components/PrimaryButton'
 import PageHeader from '../components/PageHeader'
+import ChatPanel from '../shared/ChatPanel'
 
 export default function GA4Settings() {
   const [measurementId, setMeasurementId] = useState('')
@@ -118,6 +119,10 @@ export default function GA4Settings() {
           </div>
         </div>
       </Card>
+
+      <div style={{ marginTop: 'var(--space-8)' }}>
+        <ChatPanel mode="tenant" section="ga4" />
+      </div>
     </div>
   )
 }

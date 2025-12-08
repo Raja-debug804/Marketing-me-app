@@ -63,6 +63,13 @@ export const askTenantAI = async (question: string, tenantId: string): Promise<C
   return res.data
 }
 
+export const login = async (email: string, password: string, tenantSlug?: string) => {
+  const res = await api.post('/api/v1/auth/login', { email, password, tenant_slug: tenantSlug })
+  const { access_token } = res.data
+  localStorage.setItem('token', access_token)
+  return res.data
+}
+
 export const listTemplates = async (): Promise<NotificationTemplate[]> => {
   const res = await api.get('/api/v1/notify/templates')
   return res.data

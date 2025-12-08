@@ -2,6 +2,7 @@ import React from 'react'
 import { Building2, Globe, Users } from 'lucide-react'
 import Card from '../components/Card'
 import PageHeader from '../components/PageHeader'
+import ChatPanel from '../shared/ChatPanel'
 import { useNavigate } from 'react-router-dom'
 import { useTenant } from '../context/TenantContext'
 
@@ -116,6 +117,10 @@ export default function PlatformTenants() {
             </div>
           </Card>
         ))}
+      </div>
+
+      <div style={{ marginTop: 'var(--space-8)' }}>
+        <ChatPanel mode="platform" />
       </div>
     </div>
   )

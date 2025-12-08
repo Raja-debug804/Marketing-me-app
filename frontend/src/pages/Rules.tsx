@@ -4,6 +4,7 @@ import Card from '../components/Card'
 import FormField from '../components/FormField'
 import PrimaryButton from '../components/PrimaryButton'
 import PageHeader from '../components/PageHeader'
+import ChatPanel from '../shared/ChatPanel'
 
 interface Rule {
   id: string
@@ -143,6 +144,10 @@ export default function Rules() {
             </div>
           </Card>
         ))}
+      </div>
+
+      <div style={{ marginTop: 'var(--space-8)' }}>
+        <ChatPanel mode="tenant" section="rules" />
       </div>
     </div>
   )

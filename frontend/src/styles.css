@@ -269,6 +269,35 @@ body {
   cursor: not-allowed;
 }
 
+/* Embedded Chat (within cards) */
+.chat-embedded {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 400px;
+}
+
+.chat-embedded .chat-body {
+  flex: 1;
+  padding: var(--space-4);
+  overflow-y: auto;
+  max-height: 300px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  border: 1px solid var(--light-border);
+  border-radius: var(--radius-md);
+  background: var(--soft-blue-bg-2);
+  margin-bottom: var(--space-4);
+}
+
+.chat-embedded .chat-input {
+  padding: 0;
+  border-top: none;
+  display: flex;
+  gap: var(--space-3);
+}
+
 /* Typography */
 .page-title {
   font-size: 24px;
@@ -316,6 +345,10 @@ body {
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
   transform: translateY(-1px) scale(1.02);
   background: rgba(79, 142, 247, 0.02);
+}
+
+.card-clickable {
+  cursor: pointer;
 }
 
 .card-grid {

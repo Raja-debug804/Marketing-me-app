@@ -4,6 +4,7 @@ import Card from '../components/Card'
 import FormField from '../components/FormField'
 import PrimaryButton from '../components/PrimaryButton'
 import PageHeader from '../components/PageHeader'
+import ChatPanel from '../shared/ChatPanel'
 
 export default function ShopifySettings() {
   const [shopDomain, setShopDomain] = useState('')
@@ -100,6 +101,10 @@ export default function ShopifySettings() {
           </div>
         </div>
       </Card>
+
+      <div style={{ marginTop: 'var(--space-8)' }}>
+        <ChatPanel mode="tenant" section="shopify" />
+      </div>
     </div>
   )
 }

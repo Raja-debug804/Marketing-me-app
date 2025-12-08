@@ -4,6 +4,7 @@ import Card from '../components/Card'
 import FormField from '../components/FormField'
 import PrimaryButton from '../components/PrimaryButton'
 import PageHeader from '../components/PageHeader'
+import ChatPanel from '../shared/ChatPanel'
 import { useTenant } from '../context/TenantContext'
 import { api } from '../api/client'
 
@@ -39,7 +40,7 @@ export default function Users() {
   const fetchUsers = async () => {
     try {
       setLoading(true)
-      const response = await api.get<User[]>(`/api/v1/users?tenant_id=${currentTenant?.id}`)
+      const response = await api.get<User[]>('/api/v1/users')
       setUsers(response.data)
     } catch (error) {
       console.error('Failed to fetch users:', error)
@@ -162,6 +163,10 @@ export default function Users() {
           </tbody>
         </table>
       </Card>
+
+      <div style={{ marginTop: 'var(--space-8)' }}>
+        <ChatPanel mode="tenant" section="users" />
+      </div>
 
       {/* Create User Modal */}
       {showModal && (

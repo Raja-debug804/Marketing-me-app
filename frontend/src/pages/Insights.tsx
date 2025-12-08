@@ -3,6 +3,7 @@ import { BarChart3, TrendingUp, DollarSign, Users, Target, Calendar } from 'luci
 import Card from '../components/Card'
 import MetricTile from '../components/MetricTile'
 import PageHeader from '../components/PageHeader'
+import ChatPanel from '../shared/ChatPanel'
 
 export default function Insights() {
   const [channel, setChannel] = useState('whatsapp')
@@ -176,6 +177,10 @@ export default function Insights() {
           </tbody>
         </table>
       </Card>
+
+      <div style={{ marginTop: 'var(--space-8)' }}>
+        <ChatPanel mode="tenant" section="insights" />
+      </div>
     </div>
   )
 }

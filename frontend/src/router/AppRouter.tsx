@@ -26,7 +26,7 @@ export default function AppRouter() {
       </Route>
 
       {/* Tenant workspace routes */}
-      <Route path="/tenant/:tenantSlug/app" element={<Layout />}>
+      <Route path="/tenant/:tenantSlug/app" element={<Layout requireAuth />}>
         <Route path="overview" element={<Overview />} />
         <Route path="subscriptions" element={<NotifySubscriptions />} />
         <Route path="templates" element={<Templates />} />
@@ -40,7 +40,7 @@ export default function AppRouter() {
       </Route>
 
       {/* Legacy app routes - redirect to platform/tenants */}
-      <Route path="/app" element={<Layout />}>
+      <Route path="/app" element={<Layout requireAuth />}>
         <Route path="overview" element={<Overview />} />
         <Route path="notify/subscriptions" element={<NotifySubscriptions />} />
         <Route path="notify/templates" element={<Templates />} />
@@ -52,6 +52,7 @@ export default function AppRouter() {
       </Route>
 
       <Route path="/public/snippet" element={<PublicSnippet />} />
+      <Route path="/" element={<Navigate to="/login" replace />} />
       <Route path="*" element={<Navigate to="/platform/tenants" replace />} />
     </Routes>
   )

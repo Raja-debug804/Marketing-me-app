@@ -9,7 +9,8 @@ interface CardProps {
 
 export default function Card({ children, className = '', onClick, style }: CardProps) {
   const baseClasses = 'card'
-  const combinedClasses = className ? `${baseClasses} ${className}` : baseClasses
+  const clickableClass = onClick ? 'card-clickable' : ''
+  const combinedClasses = [baseClasses, clickableClass, className].filter(Boolean).join(' ')
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (onClick && (e.key === 'Enter' || e.key === ' ')) {

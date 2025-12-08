@@ -2,6 +2,7 @@ import React from 'react'
 import { Bell, Settings, FileText, BarChart3, Users, Building } from 'lucide-react'
 import Card from '../components/Card'
 import PageHeader from '../components/PageHeader'
+import ChatPanel from '../shared/ChatPanel'
 import { Link } from 'react-router-dom'
 
 export default function Overview() {
@@ -106,6 +107,10 @@ export default function Overview() {
             ))}
           </div>
         </div>
+      </div>
+
+      <div style={{ marginTop: 'var(--space-8)' }}>
+        <ChatPanel mode="tenant" section="overview" />
       </div>
     </div>
   )

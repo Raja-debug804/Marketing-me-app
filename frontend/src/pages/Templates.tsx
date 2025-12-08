@@ -4,6 +4,7 @@ import Card from '../components/Card'
 import FormField from '../components/FormField'
 import PrimaryButton from '../components/PrimaryButton'
 import PageHeader from '../components/PageHeader'
+import ChatPanel from '../shared/ChatPanel'
 import { listTemplates, createTemplate, updateTemplate, deleteTemplate, NotificationTemplate } from '../api/client'
 
 export default function Templates() {
@@ -155,20 +156,20 @@ export default function Templates() {
                     </p>
                   </div>
                 </div>
-                <div className="flex gap-2">
+                <div className="flex gap-2 items-center">
                   <button
                     onClick={() => handleEditTemplate(template)}
                     className="btn-secondary p-2"
                     title="Edit template"
                   >
-                    <Edit2 size={16} />
+                    <Edit2 size={18} />
                   </button>
                   <button
                     onClick={() => handleDeleteTemplate(template.id)}
                     className="btn-secondary p-2 text-red-600"
                     title="Delete template"
                   >
-                    <Trash2 size={16} />
+                    <Trash2 size={18} />
                   </button>
                 </div>
               </div>
@@ -176,6 +177,10 @@ export default function Templates() {
           ))}
         </div>
       )}
+
+      <div style={{ marginTop: 'var(--space-8)' }}>
+        <ChatPanel mode="tenant" section="templates" />
+      </div>
 
       {/* Create Template Modal */}
       {showModal && (

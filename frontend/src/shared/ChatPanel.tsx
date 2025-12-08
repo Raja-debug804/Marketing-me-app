@@ -4,15 +4,18 @@ import { askPlatformAI, askTenantAI, ChatMessage, ChatResponse } from '../api/cl
 import { useTenant } from '../context/TenantContext'
 
 export type ChatScope = 'platform' | 'tenant'
+export type ChatMode = 'platform' | 'tenant'
+export type TenantSection = 'templates' | 'users' | 'shopify' | 'insights' | 'overview' | 'rules' | 'ga4'
 
 interface ChatPanelProps {
-  scope?: ChatScope
+  mode?: ChatMode
+  section?: TenantSection
 }
 
 const bubbleClass = (role: ChatMessage['role']) =>
   role === 'assistant' ? 'chat-bubble assistant' : 'chat-bubble user'
 
-export default function ChatPanel({ scope: propScope }: ChatPanelProps) {
+export default function ChatPanel({ mode: propMode, section }: ChatPanelProps) {
   const { currentTenant } = useTenant()
   const [isOpen, setIsOpen] = useState(false)
   const [input, setInput] = useState('')
@@ -20,13 +23,13 @@ export default function ChatPanel({ scope: propScope }: ChatPanelProps) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const scope = propScope || (currentTenant ? 'tenant' : 'platform')
-  const title = useMemo(() => (scope === 'platform' ? 'Platform AI Copilot' : 'Tenant AI Assistant'), [scope])
+  const mode = propMode || (currentTenant ? 'tenant' : 'platform')
+  const title = useMemo(() => (mode === 'platform' ? 'Platform AI Copilot' : 'Tenant AI Assistant'), [mode])
 
   const sendMessage = async (e: FormEvent) => {
     e.preventDefault()
     if (!input.trim()) return
-    if (scope === 'tenant' && !currentTenant) return
+    if (mode === 'tenant' && !currentTenant) return
     const userMessage: ChatMessage = { id: crypto.randomUUID(), role: 'user', content: input.trim(), created_at: new Date().toISOString() }
     setMessages((prev) => [...prev, userMessage])
     setInput('')
@@ -35,7 +38,7 @@ export default function ChatPanel({ scope: propScope }: ChatPanelProps) {
 
     try {
       let response: ChatResponse
-      if (scope === 'platform') {
+      if (mode === 'platform') {
         response = await askPlatformAI(userMessage.content)
       } else {
         response = await askTenantAI(userMessage.content, currentTenant!.id)
@@ -51,57 +54,34 @@ export default function ChatPanel({ scope: propScope }: ChatPanelProps) {
   }
 
   return (
-    <div className="chat-widget">
-      {!isOpen ? (
-        <button className="chat-toggle" onClick={() => setIsOpen(true)}>
-          <MessageCircle size={24} />
-          <span>AI Copilot</span>
+    <div className="card">
+      <div className="chat-body">
+        {messages.length === 0 && <p className="muted">Ask a question to begin.</p>}
+        {messages.map((msg) => (
+          <div key={msg.id} className={bubbleClass(msg.role)}>
+            <p>{msg.content}</p>
+          </div>
+        ))}
+        {loading && <p className="muted">Thinking...</p>}
+      </div>
+      <form className="chat-input" onSubmit={sendMessage}>
+        <textarea
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+              e.preventDefault()
+              sendMessage(e as any)
+            }
+          }}
+          placeholder="Ask a question about your data..."
+          rows={1}
+          style={{ resize: 'none' }}
+        />
+        <button type="submit" disabled={loading || (mode === 'tenant' && !currentTenant)}>
+          Send
         </button>
-      ) : (
-        <div className="chat-card">
-          <div className="chat-header">
-            <div>
-              <p className="eyebrow">AI Copilot</p>
-              <h3>{title}</h3>
-              {scope === 'tenant' && currentTenant ? (
-                <p className="muted">Context: {currentTenant.name}</p>
-              ) : (
-                <p className="muted">Platform context</p>
-              )}
-            </div>
-            <button className="chat-close" onClick={() => setIsOpen(false)}>
-              <X size={20} />
-            </button>
-          </div>
-          <div className="chat-body">
-            {messages.length === 0 && <p className="muted">Ask a question to begin.</p>}
-            {messages.map((msg) => (
-              <div key={msg.id} className={bubbleClass(msg.role)}>
-                <p>{msg.content}</p>
-              </div>
-            ))}
-            {loading && <p className="muted">Thinking...</p>}
-          </div>
-          <form className="chat-input" onSubmit={sendMessage}>
-            <textarea
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                  e.preventDefault()
-                  sendMessage(e as any)
-                }
-              }}
-              placeholder="Ask a question about your data..."
-              rows={1}
-              style={{ resize: 'none' }}
-            />
-            <button type="submit" disabled={loading || (scope === 'tenant' && !currentTenant)}>
-              Send
-            </button>
-          </form>
-        </div>
-      )}
+      </form>
     </div>
   )
 }

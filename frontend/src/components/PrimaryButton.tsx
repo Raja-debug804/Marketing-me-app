@@ -7,6 +7,7 @@ interface PrimaryButtonProps {
   loading?: boolean
   type?: 'button' | 'submit' | 'reset'
   className?: string
+  style?: React.CSSProperties
 }
 
 export default function PrimaryButton({
@@ -15,7 +16,8 @@ export default function PrimaryButton({
   disabled = false,
   loading = false,
   type = 'button',
-  className = ''
+  className = '',
+  style
 }: PrimaryButtonProps) {
   const baseClasses = 'btn-primary'
   const combinedClasses = className ? `${baseClasses} ${className}` : baseClasses
@@ -27,6 +29,7 @@ export default function PrimaryButton({
       className={combinedClasses}
       onClick={onClick}
       disabled={finalDisabled}
+      style={style}
     >
       {loading && <div className="loading-spinner" />}
       {children}
